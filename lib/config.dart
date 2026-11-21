@@ -1,0 +1,2 @@
+
+const bool utiliserFirebase = true;

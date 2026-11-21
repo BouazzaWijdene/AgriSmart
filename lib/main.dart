@@ -51,7 +51,7 @@ class AgriSmartApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AgriSmart',
+      title: 'AGRISMART',
       theme: AppTheme.clair(),
       darkTheme: AppTheme.sombre(),
       themeMode: ThemeMode.system,

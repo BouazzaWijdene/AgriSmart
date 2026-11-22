@@ -12,6 +12,9 @@ class ProfilPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Se déconnecter ?'),
+        content: const Text(
+          'Voulez-vous vraiment vous déconnecter de votre compte ?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -39,7 +42,7 @@ class ProfilPage extends StatelessWidget {
     );
 
     final email = context.select<AuthProvider, String>(
-          (a) => a.utilisateur?.email ?? '',
+          (provider) => provider.utilisateur?.email ?? '',
     );
 
     return Scaffold(
@@ -51,20 +54,25 @@ class ProfilPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const SizedBox(height: 8),
+
           const Center(
             child: CircleAvatar(
               radius: 40,
               child: Icon(Icons.agriculture, size: 40),
             ),
           ),
+
           const SizedBox(height: 12),
+
           Center(
             child: Text(
               'Exploitation AgriSmart',
               style: texte.titleLarge,
             ),
           ),
+
           Center(child: Text(email)),
+
           const SizedBox(height: 24),
           const Divider(),
 
@@ -108,7 +116,9 @@ class ProfilPage extends StatelessWidget {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 12),
+
                   const Text(
                     'AgriSmart est une application de suivi des '
                         'exploitations agricoles. Elle permet de '
@@ -116,7 +126,9 @@ class ProfilPage extends StatelessWidget {
                         'leur humidité et d’identifier les zones '
                         'qui nécessitent une irrigation.',
                   ),
+
                   const SizedBox(height: 16),
+
                   const ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.water_drop_outlined),
@@ -125,6 +137,7 @@ class ProfilPage extends StatelessWidget {
                       'Consulter le niveau d’humidité de chaque zone.',
                     ),
                   ),
+
                   const ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.bar_chart),
@@ -133,6 +146,7 @@ class ProfilPage extends StatelessWidget {
                       'Visualiser les données et les besoins en irrigation.',
                     ),
                   ),
+
                   const ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.agriculture_outlined),
@@ -147,6 +161,7 @@ class ProfilPage extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
+
           Center(
             child: Text(
               'AgriSmart - TP6 Flutter',

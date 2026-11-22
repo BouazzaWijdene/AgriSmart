@@ -1,175 +1,218 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:projet/models/zone.dart';
 import 'package:projet/providers/zones_provider.dart';
 import 'package:projet/screens/zone_detail_page.dart';
 import 'package:projet/screens/zone_form_page.dart';
-import 'package:projet/widgets/fiche_exploitation.dart';
-import 'package:projet/widgets/resume_exploitation.dart';
 import 'package:projet/widgets/zone_card.dart';
 
 class ZonesPage extends StatelessWidget {
-const ZonesPage({super.key});
+  const ZonesPage({super.key});
 
-void _message(BuildContext context, String texte) {
-ScaffoldMessenger.of(context).showSnackBar(
-SnackBar(content: Text(texte)),
-);
-}
+  static const vert = Color(0xFF245C40);
+  static const fond = Color(0xFFF5F8F3);
 
-// Ajouter une zone.
-Future<void> _ajouter(BuildContext context) async {
-final provider = context.read<ZonesProvider>();
+  void _message(BuildContext context, String texte) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(texte)),
+    );
+  }
 
-final nouvelle = await Navigator.push<Zone>(
-context,
-MaterialPageRoute(
-builder: (_) => ZoneFormPage(
-nomsExistants: provider.noms(),
-),
-),
-);
+  Future<void> _ajouter(BuildContext context) async {
+    final provider = context.read<ZonesProvider>();
 
-if (nouvelle == null || !context.mounted) return;
+    final nouvelle = await Navigator.push<Zone>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ZoneFormPage(
+          nomsExistants: provider.noms(),
+        ),
+      ),
+    );
 
-context.read<ZonesProvider>().ajouter(nouvelle);
-_message(context, 'Zone ajoutée');
-}
+    if (nouvelle == null || !context.mounted) return;
 
-// Ouvrir et modifier une zone.
-Future<void> _ouvrirDetail(
-BuildContext context,
-Zone zone,
-) async {
-final provider = context.read<ZonesProvider>();
+    context.read<ZonesProvider>().ajouter(nouvelle);
+    _message(context, 'Zone ajoutée avec succès');
+  }
 
-final modifiee = await Navigator.push<Zone>(
-context,
-MaterialPageRoute(
-builder: (_) => ZoneDetailPage(
-zone: zone,
-nomsAutres: provider.noms(sauf: zone),
-),
-),
-);
+  Future<void> _ouvrirDetail(
+      BuildContext context,
+      Zone zone,
+      ) async {
+    final provider = context.read<ZonesProvider>();
 
-if (modifiee == null || !context.mounted) return;
+    final modifiee = await Navigator.push<Zone>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ZoneDetailPage(
+          zone: zone,
+          nomsAutres: provider.noms(sauf: zone),
+        ),
+      ),
+    );
 
-context.read<ZonesProvider>().remplacer(zone, modifiee);
-_message(context, 'Zone modifiée');
-}
+    if (modifiee == null || !context.mounted) return;
 
-// Confirmer la suppression.
-Future<void> _confirmerSuppression(
-BuildContext context,
-Zone zone,
-) async {
-final confirme = await showDialog<bool>(
-context: context,
-builder: (ctx) => AlertDialog(
-title: const Text('Supprimer la zone ?'),
-content: Text(
-'La zone ${zone.nom} sera supprimée définitivement.',
-),
-actions: [
-TextButton(
-onPressed: () => Navigator.pop(ctx, false),
-child: const Text('Annuler'),
-),
-FilledButton(
-onPressed: () => Navigator.pop(ctx, true),
-child: const Text('Supprimer'),
-),
-],
-),
-);
+    context.read<ZonesProvider>().remplacer(zone, modifiee);
+    _message(context, 'Zone modifiée avec succès');
+  }
 
-if (confirme != true || !context.mounted) return;
+  Future<void> _confirmerSuppression(
+      BuildContext context,
+      Zone zone,
+      ) async {
+    final confirme = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Supprimer la zone ?'),
+        content: Text(
+          'La zone ${zone.nom} sera supprimée définitivement.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
 
-context.read<ZonesProvider>().supprimer(zone);
-_message(context, 'Zone supprimée');
-}
+    if (confirme != true || !context.mounted) return;
 
-// Construire une carte.
-Widget _carte(BuildContext context, Zone zone) {
-return ZoneCard(
-zone: zone,
-onAugmenter: () {
-context
-    .read<ZonesProvider>()
-    .modifierHumidite(zone, 5);
-},
-onDiminuer: () {
-context
-    .read<ZonesProvider>()
-    .modifierHumidite(zone, -5);
-},
-onTap: () => _ouvrirDetail(context, zone),
-onLongPress: () => _confirmerSuppression(context, zone),
-);
-}
+    context.read<ZonesProvider>().supprimer(zone);
+    _message(context, 'Zone supprimée');
+  }
 
-@override
-Widget build(BuildContext context) {
-// Une seule source de données : ZonesProvider.
-final zones = context.watch<ZonesProvider>().zones;
+  Widget _carte(BuildContext context, Zone zone) {
+    return ZoneCard(
+      zone: zone,
+      onAugmenter: () {
+        context.read<ZonesProvider>().modifierHumidite(zone, 5);
+      },
+      onDiminuer: () {
+        context.read<ZonesProvider>().modifierHumidite(zone, -5);
+      },
+      onTap: () => _ouvrirDetail(context, zone),
+      onLongPress: () => _confirmerSuppression(context, zone),
+    );
+  }
 
-return Scaffold(
-appBar: AppBar(
-backgroundColor:
-Theme.of(context).colorScheme.inversePrimary,
-title: const Text('AgriSmart'),
-),
-floatingActionButton: FloatingActionButton(
-onPressed: () => _ajouter(context),
-child: const Icon(Icons.add),
-),
-body: Column(
-children: [
-FicheExploitation(
-humiditeMoyenne: humiditeMoyenne(zones),
-),
-ResumeExploitation(zones: zones),
-Expanded(
-child: zones.isEmpty
-? const Center(
-child: Text('Aucune zone pour le moment'),
-)
-    : LayoutBuilder(
-builder: (context, constraints) {
-if (constraints.maxWidth >= 600) {
-return GridView.builder(
-padding: const EdgeInsets.only(
-bottom: 80,
-),
-gridDelegate:
-const SliverGridDelegateWithFixedCrossAxisCount(
-crossAxisCount: 2,
-childAspectRatio: 2.8,
-),
-itemCount: zones.length,
-itemBuilder: (context, index) {
-return _carte(context, zones[index]);
-},
-);
-}
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ZonesProvider>();
+    final zones = provider.zones;
 
-return ListView.separated(
-padding: const EdgeInsets.only(
-bottom: 80,
-),
-itemCount: zones.length,
-separatorBuilder: (_, __) =>
-const Divider(),
-itemBuilder: (context, index) {
-return _carte(context, zones[index]);
-},
-);
-},
-),
-),
-],
-),
-);
-}
+    return Scaffold(
+      backgroundColor: fond,
+      appBar: AppBar(
+        backgroundColor: fond,
+        elevation: 0,
+        title: const Text(
+          'Mes parcelles',
+          style: TextStyle(
+            color: vert,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: CircleAvatar(
+              backgroundColor: const Color(0xFFE1EDE3),
+              child: Text(
+                '${provider.nombre}',
+                style: const TextStyle(
+                  color: vert,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _ajouter(context),
+        backgroundColor: vert,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter une parcelle'),
+      ),
+      body: zones.isEmpty
+          ? Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.agriculture_outlined,
+                size: 65,
+                color: vert,
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                'Aucune parcelle pour le moment',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: vert,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Ajoutez votre première parcelle pour commencer le suivi.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+              FilledButton.icon(
+                onPressed: () => _ajouter(context),
+                icon: const Icon(Icons.add),
+                label: const Text('Ajouter une parcelle'),
+              ),
+            ],
+          ),
+        ),
+      )
+          : LayoutBuilder(
+        builder: (context, constraints) {
+          final largeur = constraints.maxWidth;
+
+          if (largeur >= 700) {
+            return GridView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 90),
+              gridDelegate:
+              const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 2.8,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: zones.length,
+              itemBuilder: (context, index) {
+                return _carte(context, zones[index]);
+              },
+            );
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 90),
+            itemCount: zones.length,
+            separatorBuilder: (_, __) =>
+            const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              return _carte(context, zones[index]);
+            },
+          );
+        },
+      ),
+    );
+  }
 }

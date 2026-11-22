@@ -44,7 +44,9 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> deconnexion() => _auth.signOut();
 
-  Future<void> _executer(Future<void> Function() operation) async {
+  Future<void> _executer(
+      Future<void> Function() operation,
+      ) async {
     try {
       await operation();
     } on FirebaseAuthException catch (e) {
@@ -58,30 +60,26 @@ class FirebaseAuthService implements AuthService {
     switch (code) {
       case 'invalid-email':
         return "L'adresse email n'est pas valide";
+
       case 'user-not-found':
       case 'wrong-password':
       case 'invalid-credential':
         return 'Email ou mot de passe incorrect';
+
       case 'email-already-in-use':
         return 'Un compte existe déjà avec cet email';
+
       case 'weak-password':
         return 'Mot de passe trop faible (6 caractères minimum)';
+
       case 'network-request-failed':
         return 'Pas de connexion Internet';
+
       case 'too-many-requests':
         return 'Trop de tentatives, réessayez plus tard';
-      case 'user-not-found':
-        return 'Aucun compte trouvé avec cet email';
-      case 'invalid-email':
-        return 'Adresse email invalide';
-      case 'too-many-requests':
-        return 'Trop de tentatives, réessayez plus tard';
-      case 'network-request-failed':
-        return 'Problème de connexion Internet';
 
       default:
         return "Erreur d'authentification ($code)";
-
     }
   }
 }

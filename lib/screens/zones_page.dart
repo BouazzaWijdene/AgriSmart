@@ -205,7 +205,7 @@ class ZonesPage extends StatelessWidget {
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 90),
             itemCount: zones.length,
-            separatorBuilder: (_, __) =>
+            separatorBuilder: (_, _) =>
             const SizedBox(height: 10),
             itemBuilder: (context, index) {
               return _carte(context, zones[index]);

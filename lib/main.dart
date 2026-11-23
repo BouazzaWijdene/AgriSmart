@@ -2,11 +2,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:projet/providers/meteo_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:projet/config.dart';
 import 'package:projet/firebase_options.dart';
 import 'package:projet/providers/auth_provider.dart';
 import 'package:projet/providers/zones_provider.dart';
+import 'package:projet/providers/meteo_provider.dart';
+import 'package:projet/providers/reglages_provider.dart';
 import 'package:projet/screens/auth_gate.dart';
 import 'package:projet/service/auth_locale_service.dart';
 import 'package:projet/service/auth_service.dart';
@@ -27,6 +30,8 @@ Future<void> main() async {
     authService = AuthLocaleService();
   }
 
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
     MultiProvider(
       providers: [
@@ -34,10 +39,16 @@ Future<void> main() async {
           create: (_) => AuthProvider(authService),
         ),
         ChangeNotifierProvider(
-          create: (_) => ZonesProvider(),
+          create: (context) => ZonesProvider(
+            prefs,
+            context.read<AuthProvider>(),
+          ),
         ),
         ChangeNotifierProvider(
-          create: (_) => MeteoProvider(),
+          create: (_) => MeteoProvider(prefs)..charger(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ReglagesProvider(prefs),
         ),
       ],
       child: const AgriSmartApp(),
@@ -54,7 +65,7 @@ class AgriSmartApp extends StatelessWidget {
       title: 'AgriSmart',
       theme: AppTheme.clair(),
       darkTheme: AppTheme.sombre(),
-      themeMode: ThemeMode.system,
+      themeMode: context.watch<ReglagesProvider>().themeMode,
       home: const AuthGate(),
     );
   }

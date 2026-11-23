@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:projet/providers/zones_provider.dart';
 import 'package:projet/providers/auth_provider.dart';
+import 'package:projet/providers/reglages_provider.dart';
 
 class ProfilPage extends StatelessWidget {
   const ProfilPage({super.key});
@@ -45,6 +47,10 @@ class ProfilPage extends StatelessWidget {
           (provider) => provider.utilisateur?.email ?? '',
     );
 
+    final themeMode = context.select<ReglagesProvider, ThemeMode>(
+          (provider) => provider.themeMode,
+    );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -81,6 +87,44 @@ class ProfilPage extends StatelessWidget {
             title: const Text('Zones suivies'),
             trailing: Text('$nombreZones'),
           ),
+
+          // Sélection du thème
+          const ListTile(
+            leading: Icon(Icons.brightness_6),
+            title: Text('Thème de l’application'),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: SegmentedButton<ThemeMode>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  label: Text('Système'),
+                  icon: Icon(Icons.settings_suggest),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text('Clair'),
+                  icon: Icon(Icons.light_mode),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text('Sombre'),
+                  icon: Icon(Icons.dark_mode),
+                ),
+              ],
+              selected: {themeMode},
+              onSelectionChanged: (choix) {
+                context
+                    .read<ReglagesProvider>()
+                    .changerTheme(choix.first);
+              },
+            ),
+          ),
+
+          const SizedBox(height: 12),
 
           ListTile(
             leading: const Icon(Icons.logout),
@@ -164,7 +208,7 @@ class ProfilPage extends StatelessWidget {
 
           Center(
             child: Text(
-              'AgriSmart - TP6 Flutter',
+              'AgriSmart - TP8 Flutter',
               style: texte.bodySmall,
             ),
           ),

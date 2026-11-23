@@ -62,9 +62,18 @@ class MeteoCard extends StatelessWidget {
             }
 
             final pluie = meteo.pluieTotale;
+
             final conseil = pluie >= 5
                 ? 'Pluie prévue : repoussez l’irrigation si les conditions du sol le permettent.'
                 : 'Pas de pluie significative prévue : vérifiez les besoins en irrigation.';
+
+            final date = provider.miseAJour;
+
+            final dateFormatee = date != null
+                ? '${date.day}/${date.month}/${date.year} à '
+                '${date.hour.toString().padLeft(2, '0')}:'
+                '${date.minute.toString().padLeft(2, '0')}'
+                : 'date inconnue';
 
             return _conteneur(
               child: Column(
@@ -98,8 +107,58 @@ class MeteoCard extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 15),
 
+                  // État de connexion et date de mise à jour
+                  if (provider.horsLigne || date != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: provider.horsLigne
+                            ? const Color(0xFFFFF2DF)
+                            : const Color(0xFFEAF3E9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            provider.horsLigne
+                                ? Icons.cloud_off
+                                : Icons.cloud_done,
+                            color: provider.horsLigne
+                                ? Colors.orange
+                                : vert,
+                            size: 19,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${provider.horsLigne ? 'Hors ligne : données du' : 'Mis à jour le'} $dateFormatee',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: texte,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: provider.chargerMeteo,
+                            tooltip: 'Actualiser',
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: vert,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+
+                  // Température actuelle
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(

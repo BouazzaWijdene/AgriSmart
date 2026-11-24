@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet/models/zone.dart';
 import 'package:projet/screens/zone_form_page.dart';
+import 'package:projet/service/irrigation_conseil_service.dart';
 import 'package:projet/theme/app_them.dart';
 
 class ZoneDetailPage extends StatelessWidget {
@@ -39,6 +40,12 @@ class ZoneDetailPage extends StatelessWidget {
     zone.culture.length < 4 ? zone.culture.length : 4;
 
     final texte = Theme.of(context).textTheme;
+
+    final conseil = IrrigationConseilService.evaluer(
+      zone: zone,
+      temperatureC: null,
+      precipitationMm: null,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -126,6 +133,42 @@ class ZoneDetailPage extends StatelessWidget {
                   title: const Text('Vanne'),
                   trailing: Text(
                     zone.vanneOuverte ? 'Ouverte' : 'Fermée',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: conseil.urgent
+                  ? const Color(0xFFFFF4E5)
+                  : const Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: conseil.urgent
+                    ? const Color(0xFFE6A100)
+                    : const Color(0xFF2E7D32),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  conseil.titre,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1B1B1B),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  conseil.message,
+                  style: const TextStyle(
+                    color: Color(0xFF1B1B1B),
                   ),
                 ),
               ],

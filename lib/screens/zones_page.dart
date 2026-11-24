@@ -6,6 +6,7 @@ import 'package:projet/screens/zone_detail_page.dart';
 import 'package:projet/screens/zone_form_page.dart';
 import 'package:projet/widgets/filtre_zones_bar.dart';
 import 'package:projet/widgets/zone_card.dart';
+import 'package:projet/widgets/rapport_dialog.dart';
 
 class ZonesPage extends StatefulWidget {
   const ZonesPage({super.key});
@@ -163,6 +164,11 @@ class _ZonesPageState extends State<ZonesPage> {
           ),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Générer le rapport',
+            icon: const Icon(Icons.assignment_outlined, color: vert),
+            onPressed: () => RapportDialog.afficher(context, zones),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: CircleAvatar(
